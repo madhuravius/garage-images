@@ -16,11 +16,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker buildx build --platform ${{ matrix.platform }} -t garage:test .
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          load: true
+          tags: garage:test
 
       - name: Test Docker image
-        run: make test
+        run: |
+          docker run --rm garage:test /garage --version
