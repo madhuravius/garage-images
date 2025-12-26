@@ -3,7 +3,6 @@ ARG RUST_VERSION=latest
 ARG GARAGE_VERSION=v2
 FROM rust:${RUST_VERSION} AS builder
 
-ARG TARGETARCH
 ARG GARAGE_VERSION
 
 WORKDIR /build
@@ -29,11 +28,14 @@ RUN git clone https://github.com/deuxfleurs-org/garage.git . && \
 # Set architecture-specific RUSTFLAGS
 # ARM64: disable hardware crypto (Pi 3/4 lack aes/sha2 instructions)
 # AMD64: use baseline x86-64 for broad compatibility
-RUN if [ "$TARGETARCH" = "arm64" ]; then \
+RUN ARCH=$(uname -m) && \
+    echo "Detected architecture: $ARCH" && \
+    if [ "$ARCH" = "aarch64" ]; then \
       export RUSTFLAGS="-C target-cpu=generic -C target-feature=-aes,-sha2"; \
     else \
       export RUSTFLAGS="-C target-cpu=x86-64"; \
     fi && \
+    echo "Using RUSTFLAGS: $RUSTFLAGS" && \
     cargo build --release && \
     cp target/release/garage /garage-binary
 
