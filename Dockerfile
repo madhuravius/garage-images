@@ -26,7 +26,7 @@ RUN git clone https://github.com/deuxfleurs-org/garage.git . && \
       git checkout ${GARAGE_VERSION}; \
     fi
 
-# Just build for the native target
+ENV RUSTFLAGS="-C target-cpu=generic"
 RUN cargo build --release && \
     cp target/release/garage /garage-binary
 
