@@ -67,3 +67,12 @@ Tags:
 
 * [Garage](https://garagehq.deuxfleurs.fr/)
 * [Deuxfleurs](https://deuxfleurs.fr/)
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+
+This Docker image contains [Garage](https://garagehq.deuxfleurs.fr/), which is licensed under AGPL-3.0.
+Source code is available at: https://github.com/deuxfleurs-org/garage
+
+The Dockerfile and build scripts in this repository are also licensed under AGPL-3.0.

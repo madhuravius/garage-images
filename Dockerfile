@@ -35,6 +35,9 @@ FROM gcr.io/distroless/cc-debian12:nonroot
 
 COPY --from=builder /garage-binary /garage
 
+COPY LICENSE /LICENSE
+COPY NOTICE /NOTICE
+
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG=garage=info
 
