@@ -45,4 +45,7 @@ COPY --from=builder /garage-binary /garage
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG=garage=info
 
+COPY LICENSE /LICENSE
+COPY NOTICE /NOTICE
+
 CMD ["/garage", "server"]
