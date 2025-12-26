@@ -26,8 +26,15 @@ RUN git clone https://github.com/deuxfleurs-org/garage.git . && \
       git checkout ${GARAGE_VERSION}; \
     fi
 
-ENV RUSTFLAGS="-C target-cpu=generic"
-RUN cargo build --release && \
+# Set architecture-specific RUSTFLAGS
+# ARM64: disable hardware crypto (Pi 3/4 lack aes/sha2 instructions)
+# AMD64: use baseline x86-64 for broad compatibility
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+      export RUSTFLAGS="-C target-cpu=generic -C target-feature=-aes,-sha2"; \
+    else \
+      export RUSTFLAGS="-C target-cpu=x86-64"; \
+    fi && \
+    cargo build --release && \
     cp target/release/garage /garage-binary
 
 # ---- runtime stage ----
@@ -37,5 +44,8 @@ COPY --from=builder /garage-binary /garage
 
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG=garage=info
+
+COPY LICENSE /LICENSE
+COPY NOTICE /NOTICE
 
 CMD ["/garage", "server"]
