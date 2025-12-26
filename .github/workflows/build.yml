@@ -14,17 +14,33 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ubuntu-latest
-          - runner: ubuntu-24.04-arm
+          - arch: amd64
+          - arch: arm64
 
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Docker image (local arch)
-        run: make build-local
+      - name: Set up QEMU
+        if: matrix.arch == 'arm64'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker buildx build \
+            --platform linux/${{ matrix.arch }} \
+            --build-arg RUST_VERSION=${{ env.RUST_VERSION }} \
+            --build-arg GARAGE_VERSION=${{ env.GARAGE_VERSION }} \
+            --build-arg TARGETARCH=${{ matrix.arch }} \
+            -t ${{ env.IMAGE_NAME }}:test \
+            --load \
+            .
 
       - name: Test Docker image
-        run: make test
+        run: |
+          docker run --rm ${{ env.IMAGE_NAME }}:test /garage --version
